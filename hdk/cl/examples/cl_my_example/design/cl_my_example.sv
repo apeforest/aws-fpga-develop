@@ -13,7 +13,7 @@
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
-module cl_hello_world 
+module cl_my_example 
 
 (
    `include "cl_ports.vh" // Fixed port definition
@@ -22,7 +22,7 @@ module cl_hello_world
 
 `include "cl_common_defines.vh"      // CL Defines for all examples
 `include "cl_id_defines.vh"          // Defines for ID0 and ID1 (PCI ID's)
-`include "cl_hello_world_defines.vh" // CL Defines for cl_hello_world
+`include "cl_my_example_defines.vh" // CL Defines for cl_my_example
 
 logic rst_main_n_sync;
 
@@ -52,16 +52,16 @@ logic rst_main_n_sync;
 //-------------------------------------------------
   logic        arvalid_q;
   logic [31:0] araddr_q;
-  logic [31:0] hello_world_q_byte_swapped;
-  logic [31:0] hello_world_q_byte_shift;
+  logic [31:0] my_example_q_byte_swapped;
+  logic [31:0] my_example_q_byte_shift;
   logic [15:0] vled_q;
   logic [15:0] pre_cl_sh_status_vled;
   logic [15:0] sh_cl_status_vdip_q;
   logic [15:0] sh_cl_status_vdip_q2;
-  logic [31:0] hello_world_q;
+  logic [31:0] my_example_q;
 
 //-------------------------------------------------
-// ID Values (cl_hello_world_defines.vh)
+// ID Values (cl_my_example_defines.vh)
 //-------------------------------------------------
   assign cl_sh_id0[31:0] = `CL_SH_ID0;
   assign cl_sh_id1[31:0] = `CL_SH_ID1;
@@ -259,7 +259,7 @@ always_ff @(posedge clk_main_a0)
    else if (arvalid_q) 
    begin
       rvalid <= 1;
-      rdata  <= (araddr_q == `HELLO_WORLD_REG_ADDR) ? hello_world_q_byte_shift[31:0]:
+      rdata  <= (araddr_q == `MY_EXAMPLE_REG_ADDR) ? my_example_q_byte_shift[31:0]:
                 (araddr_q == `VLED_REG_ADDR       ) ? {16'b0,vled_q[15:0]            }:
                                                       `UNIMPLEMENTED_REG_VALUE        ;
       rresp  <= 0;
@@ -272,18 +272,18 @@ always_ff @(posedge clk_main_a0)
 
 always_ff @(posedge clk_main_a0)
    if (!rst_main_n_sync) begin                    // Reset
-      hello_world_q[31:0] <= 32'h0000_0000;
+      my_example_q[31:0] <= 32'h0000_0000;
    end
-   else if (wready & (wr_addr == `HELLO_WORLD_REG_ADDR)) begin  
-      hello_world_q[31:0] <= wdata[31:0];
+   else if (wready & (wr_addr == `MY_EXAMPLE_REG_ADDR)) begin  
+      my_example_q[31:0] <= wdata[31:0];
    end
    else begin                                // Hold Value
-      hello_world_q[31:0] <= hello_world_q[31:0];
+      my_example_q[31:0] <= my_example_q[31:0];
    end
 
-assign hello_world_q_byte_swapped[31:0] = {hello_world_q[7:0],   hello_world_q[15:8],
-                                           hello_world_q[23:16], hello_world_q[31:24]};
-assign hello_world_q_byte_shift[31:0] = {hello_world_q[30:0], hello_world_q[31]};
+assign my_example_q_byte_swapped[31:0] = {my_example_q[7:0],   my_example_q[15:8],
+                                           my_example_q[23:16], my_example_q[31:24]};
+assign my_example_q_byte_shift[31:0] = {my_example_q[30:0], my_example_q[31]};
 
 
 //-------------------------------------------------
@@ -303,7 +303,7 @@ always_ff @(posedge clk_main_a0)
    end
 
 // The register contains 16 read-only bits corresponding to 16 LED's.
-// For this example, the virtual LED register shadows the hello_world
+// For this example, the virtual LED register shadows the my_example
 // register.
 // The same LED values can be read from the CL to Shell interface
 // by using the linux FPGA tool: $ fpga-get-virtual-led -S 0
@@ -313,7 +313,7 @@ always_ff @(posedge clk_main_a0)
       vled_q[15:0] <= 16'h0000;
    end
    else begin
-      vled_q[15:0] <= hello_world_q[15:0];
+      vled_q[15:0] <= my_example_q[15:0];
    end
 
 // The Virtual LED outputs will be masked with the Virtual DIP switches.

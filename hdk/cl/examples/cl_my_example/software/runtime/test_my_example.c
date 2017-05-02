@@ -27,7 +27,7 @@
 /* these register addresses should match the addresses in */
 /* /aws-fpga/hdk/cl/examples/common/cl_common_defines.vh */
 
-#define HELLO_WORLD_REG_ADDR UINT64_C(0x500)
+#define MY_EXAMPLE_REG_ADDR UINT64_C(0x500)
 #define VLED_REG_ADDR	UINT64_C(0x504)
 
 /*
@@ -119,12 +119,12 @@ int peek_poke_example(int slot_id, int pf_id, int bar_id) {
     /* write a value into the mapped address space */
     uint32_t value = 0xefbeadde;
     uint32_t expected = 0xdf7d5bbd;
-    rc = fpga_pci_poke(pci_bar_handle, HELLO_WORLD_REG_ADDR, value);
+    rc = fpga_pci_poke(pci_bar_handle, MY_EXAMPLE_REG_ADDR, value);
     fail_on(rc, out, "Unable to write to the fpga !");
 
     /* read it back and print it out; you should expect the byte order to be
      * reversed (That's what this CL does) */
-    rc = fpga_pci_peek(pci_bar_handle, HELLO_WORLD_REG_ADDR, &value);
+    rc = fpga_pci_peek(pci_bar_handle, MY_EXAMPLE_REG_ADDR, &value);
     fail_on(rc, out, "Unable to read read from the fpga !");
     printf("register: 0x%x\n", value);
     if(value == expected) {
@@ -148,7 +148,7 @@ out:
 
 
 /*
- * check if the corresponding AFI for hello_world is loaded
+ * check if the corresponding AFI for my_example is loaded
  */
 
 int check_afi_ready(int slot_id) {

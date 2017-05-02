@@ -26,7 +26,7 @@
 
 #include "sh_dpi_tasks.h"
 
-#define HELLO_WORLD_REG_ADDR UINT64_C(0x00)
+#define MY_EXAMPLE_REG_ADDR UINT64_C(0x00)
 
 void test_main(uint32_t *exit_code) {
 
@@ -47,11 +47,11 @@ void test_main(uint32_t *exit_code) {
 #endif
 #endif
 
-  log_printf("Writing 0xDEAD_BEEF to address 0x%x", HELLO_WORLD_REG_ADDR);
-  cl_poke(HELLO_WORLD_REG_ADDR, 0xDEADBEEF);
-  cl_peek(HELLO_WORLD_REG_ADDR, &rdata);
+  log_printf("Writing 0xDEAD_BEEF to address 0x%x", MY_EXAMPLE_REG_ADDR);
+  cl_poke(MY_EXAMPLE_REG_ADDR, 0xDEADBEEF);
+  cl_peek(MY_EXAMPLE_REG_ADDR, &rdata);
 
-  log_printf("Reading 0x%x from address 0x%x", rdata, HELLO_WORLD_REG_ADDR);
+  log_printf("Reading 0x%x from address 0x%x", rdata, MY_EXAMPLE_REG_ADDR);
 
   if (rdata == 0xEFBEADDE) {
     log_printf("Test PASSED");

@@ -15,7 +15,7 @@
 
 package require tar
 
-set TOP cl_hello_world 
+set TOP cl_my_example 
 
 #################################################
 ## Command-line Arguments
