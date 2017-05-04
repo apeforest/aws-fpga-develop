@@ -21,6 +21,7 @@
 
 // CL Register Addresses
 `define HELLO_WORLD_REG_ADDR    32'h0000_0500
+`define MY_EXAMPLE_REG_ADDR     32'h0000_0500
 `define VLED_REG_ADDR           32'h0000_0504
 
 `endif
