@@ -54,6 +54,7 @@ logic rst_main_n_sync;
   logic [31:0] araddr_q;
   logic [31:0] my_example_q_byte_swapped;
   logic [31:0] my_example_q_byte_shift;
+  logic [31:0] my_example_q_byte_mult;
   logic [15:0] vled_q;
   logic [15:0] pre_cl_sh_status_vled;
   logic [15:0] sh_cl_status_vdip_q;
@@ -259,7 +260,7 @@ always_ff @(posedge clk_main_a0)
    else if (arvalid_q) 
    begin
       rvalid <= 1;
-      rdata  <= (araddr_q == `MY_EXAMPLE_REG_ADDR) ? my_example_q_byte_shift[31:0]:
+      rdata  <= (araddr_q == `MY_EXAMPLE_REG_ADDR) ? my_example_q_byte_mult[31:0]:
                 (araddr_q == `VLED_REG_ADDR       ) ? {16'b0,vled_q[15:0]            }:
                                                       `UNIMPLEMENTED_REG_VALUE        ;
       rresp  <= 0;
@@ -285,6 +286,7 @@ assign my_example_q_byte_swapped[31:0] = {my_example_q[7:0],   my_example_q[15:8
                                            my_example_q[23:16], my_example_q[31:24]};
 assign my_example_q_byte_shift[31:0] = {my_example_q[30:0], my_example_q[31]};
 
+assign my_example_q_byte_mult[31:0] = {16'b0, my_example_q[15:0]} * 32'h0000_0005;
 
 //-------------------------------------------------
 // Virtual LED Register

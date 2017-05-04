@@ -43,7 +43,8 @@ logic [15:0] vled_value;
       tb.peek(.addr(`MY_EXAMPLE_REG_ADDR), .data(rdata), .id(AXI_ID), .size(DataSize::UINT16), .intf(AxiPort::PORT_OCL));         // start read & write
       $display ("Reading 0x%x from address 0x%x", rdata, `MY_EXAMPLE_REG_ADDR);
 
-      if (rdata == 32'hBD5B_7DDF) // Check for byte swap in register read
+      //if (rdata == 32'hBD5B_7DDF) // Check for byte shift in register read
+      if (rdata == 32'h0003_BAAB) // check for 0x0beef * 5
         $display ("Test PASSED");
       else
         $display ("Test FAILED");
