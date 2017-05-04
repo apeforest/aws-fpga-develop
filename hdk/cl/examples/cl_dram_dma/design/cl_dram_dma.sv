@@ -56,7 +56,7 @@ module cl_dram_dma #(parameter NUM_DDR=4)
 `ifdef SIM
    localparam DDR_SCRB_MAX_ADDR = 64'h1FFF;
 `else   
-   localparam DDR_SCRB_MAX_ADDR = 64'h3FFFFFFFF; //16GB 
+   DDR_SCRB_MAX_ADDR = 64'h3FFFFFFFF; //16GB 
 `endif
    localparam DDR_SCRB_BURST_LEN_MINUS1 = 15;
 
@@ -244,7 +244,7 @@ assign cl_sh_dma_pcis_rvalid = sh_cl_dma_pcis_bus.rvalid;
 assign cl_sh_dma_pcis_rid = sh_cl_dma_pcis_bus.rid[5:0];
 assign cl_sh_dma_pcis_rlast = sh_cl_dma_pcis_bus.rlast;
 assign cl_sh_dma_pcis_rresp = sh_cl_dma_pcis_bus.rresp;
-assign cl_sh_dma_pcis_rdata = sh_cl_dma_pcis_bus.rdata;
+assign cl_sh_dma_pcis_rdata = (sh_cl_dma_pcis_bus.rdata << 1);
 assign sh_cl_dma_pcis_bus.rready = sh_cl_dma_pcis_rready;
 
 assign cl_sh_ddr_awid = cl_sh_ddr_bus.awid;
