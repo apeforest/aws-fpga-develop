@@ -244,7 +244,17 @@ assign cl_sh_dma_pcis_rvalid = sh_cl_dma_pcis_bus.rvalid;
 assign cl_sh_dma_pcis_rid = sh_cl_dma_pcis_bus.rid[5:0];
 assign cl_sh_dma_pcis_rlast = sh_cl_dma_pcis_bus.rlast;
 assign cl_sh_dma_pcis_rresp = sh_cl_dma_pcis_bus.rresp;
-assign cl_sh_dma_pcis_rdata = (sh_cl_dma_pcis_bus.rdata << 1);
+assign cl_sh_dma_pcis_rdata = sh_cl_dma_pcis_bus.rdata;
+
+assign cl_sh_dma_pcis_rdata[63:0] = sh_cl_dma_pcis_bus.rdata[63:32] * sh_cl_dma_pcis_bus.rdata[31:0];
+assign cl_sh_dma_pcis_rdata[127:64] = sh_cl_dma_pcis_bus.rdata[127:96] * sh_cl_dma_pcis_bus.rdata[95:64];
+assign cl_sh_dma_pcis_rdata[191:128] = sh_cl_dma_pcis_bus.rdata[191:160] * sh_cl_dma_pcis_bus.rdata[159:128];
+assign cl_sh_dma_pcis_rdata[255:192] = sh_cl_dma_pcis_bus.rdata[255:224] * sh_cl_dma_pcis_bus.rdata[223:192];
+assign cl_sh_dma_pcis_rdata[319:256] = sh_cl_dma_pcis_bus.rdata[319:288] * sh_cl_dma_pcis_bus.rdata[287:256];
+assign cl_sh_dma_pcis_rdata[383:320] = sh_cl_dma_pcis_bus.rdata[383:352] * sh_cl_dma_pcis_bus.rdata[351:320];
+assign cl_sh_dma_pcis_rdata[447:384] = sh_cl_dma_pcis_bus.rdata[447:416] * sh_cl_dma_pcis_bus.rdata[415:384];
+assign cl_sh_dma_pcis_rdata[511:448] = sh_cl_dma_pcis_bus.rdata[511:480] * sh_cl_dma_pcis_bus.rdata[479:448];
+
 assign sh_cl_dma_pcis_bus.rready = sh_cl_dma_pcis_rready;
 
 assign cl_sh_ddr_awid = cl_sh_ddr_bus.awid;
