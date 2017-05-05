@@ -27,5 +27,6 @@
 //uncomment below to make SH and CL async
 `define SH_CL_ASYNC
 
+`define SIM
 `endif
 
