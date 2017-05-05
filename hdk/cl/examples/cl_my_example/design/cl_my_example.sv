@@ -286,7 +286,7 @@ assign my_example_q_byte_swapped[31:0] = {my_example_q[7:0],   my_example_q[15:8
                                            my_example_q[23:16], my_example_q[31:24]};
 assign my_example_q_byte_shift[31:0] = {my_example_q[30:0], my_example_q[31]};
 
-assign my_example_q_byte_mult[31:0] = {16'b0, my_example_q[15:0]} * 32'h0000_0005;
+assign my_example_q_byte_mult[31:0] = {16'b0, my_example_q[15:0]} * {16'b0, my_example_q[31:16]};
 
 //-------------------------------------------------
 // Virtual LED Register
