@@ -263,14 +263,14 @@ wire [63:0] prod5;
 wire [63:0] prod6;
 wire [63:0] prod7;
 
-cl_unsigned_mult mult0(prod0, sh_cl_dma_pcis_bus.rdata[63:32], sh_cl_dma_pcis_bus.rdata[31:0]);
-cl_unsigned_mult mult1(prod1, sh_cl_dma_pcis_bus.rdata[127:96], sh_cl_dma_pcis_bus.rdata[95:64]);
-cl_unsigned_mult mult2(prod2, sh_cl_dma_pcis_bus.rdata[191:160], sh_cl_dma_pcis_bus.rdata[159:128]);
-cl_unsigned_mult mult3(prod3, sh_cl_dma_pcis_bus.rdata[255:224], sh_cl_dma_pcis_bus.rdata[223:192]);
-cl_unsigned_mult mult4(prod4, sh_cl_dma_pcis_bus.rdata[319:288], sh_cl_dma_pcis_bus.rdata[287:256]);
-cl_unsigned_mult mult5(prod5, sh_cl_dma_pcis_bus.rdata[383:352], sh_cl_dma_pcis_bus.rdata[351:320]);
-cl_unsigned_mult mult6(prod6, sh_cl_dma_pcis_bus.rdata[447:416], sh_cl_dma_pcis_bus.rdata[415:384]);
-cl_unsigned_mult mult7(prod7, sh_cl_dma_pcis_bus.rdata[511:480], sh_cl_dma_pcis_bus.rdata[479:448]);
+cl_unsigned_mult mult0(.out(prod0), .a(sh_cl_dma_pcis_bus.rdata[63:32]), .b(sh_cl_dma_pcis_bus.rdata[31:0]));
+cl_unsigned_mult mult1(.out(prod1), .a(sh_cl_dma_pcis_bus.rdata[127:96]), .b(sh_cl_dma_pcis_bus.rdata[95:64]));
+cl_unsigned_mult mult2(.out(prod2), .a(sh_cl_dma_pcis_bus.rdata[191:160]), .b(sh_cl_dma_pcis_bus.rdata[159:128]));
+cl_unsigned_mult mult3(.out(prod3), .a(sh_cl_dma_pcis_bus.rdata[255:224]), .b(sh_cl_dma_pcis_bus.rdata[223:192]));
+cl_unsigned_mult mult4(.out(prod4), .a(sh_cl_dma_pcis_bus.rdata[319:288]), .b(sh_cl_dma_pcis_bus.rdata[287:256]));
+cl_unsigned_mult mult5(.out(prod5), .a(sh_cl_dma_pcis_bus.rdata[383:352]), .b(sh_cl_dma_pcis_bus.rdata[351:320]));
+cl_unsigned_mult mult6(.out(prod6), .a(sh_cl_dma_pcis_bus.rdata[447:416]), .b(sh_cl_dma_pcis_bus.rdata[415:384]));
+cl_unsigned_mult mult7(.out(prod7), .a(sh_cl_dma_pcis_bus.rdata[511:480]), .b(sh_cl_dma_pcis_bus.rdata[479:448]));
 
 assign cl_sh_dma_pcis_rdata = {prod0, prod1, prod2, prod3, prod4, prod5, prod6, prod7};
 
