@@ -13,6 +13,14 @@
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
+module cl_unsigned_mult (out, a, b);
+        output [64:0] out;
+	input  [32:0] a;
+	input  [32:0] b;
+
+	assign out = a * b;
+endmodule
+
 module cl_dram_dma #(parameter NUM_DDR=4) 
 
 (
@@ -246,14 +254,34 @@ assign cl_sh_dma_pcis_rlast = sh_cl_dma_pcis_bus.rlast;
 assign cl_sh_dma_pcis_rresp = sh_cl_dma_pcis_bus.rresp;
 assign cl_sh_dma_pcis_rdata = sh_cl_dma_pcis_bus.rdata;
 
-assign cl_sh_dma_pcis_rdata[63:0] = sh_cl_dma_pcis_bus.rdata[63:32] * sh_cl_dma_pcis_bus.rdata[31:0];
-assign cl_sh_dma_pcis_rdata[127:64] = sh_cl_dma_pcis_bus.rdata[127:96] * sh_cl_dma_pcis_bus.rdata[95:64];
-assign cl_sh_dma_pcis_rdata[191:128] = sh_cl_dma_pcis_bus.rdata[191:160] * sh_cl_dma_pcis_bus.rdata[159:128];
-assign cl_sh_dma_pcis_rdata[255:192] = sh_cl_dma_pcis_bus.rdata[255:224] * sh_cl_dma_pcis_bus.rdata[223:192];
-assign cl_sh_dma_pcis_rdata[319:256] = sh_cl_dma_pcis_bus.rdata[319:288] * sh_cl_dma_pcis_bus.rdata[287:256];
-assign cl_sh_dma_pcis_rdata[383:320] = sh_cl_dma_pcis_bus.rdata[383:352] * sh_cl_dma_pcis_bus.rdata[351:320];
-assign cl_sh_dma_pcis_rdata[447:384] = sh_cl_dma_pcis_bus.rdata[447:416] * sh_cl_dma_pcis_bus.rdata[415:384];
-assign cl_sh_dma_pcis_rdata[511:448] = sh_cl_dma_pcis_bus.rdata[511:480] * sh_cl_dma_pcis_bus.rdata[479:448];
+wire [63:0] prod0;
+wire [63:0] prod1;
+wire [63:0] prod2;
+wire [63:0] prod3;
+wire [63:0] prod4;
+wire [63:0] prod5;
+wire [63:0] prod6;
+wire [63:0] prod7;
+
+cl_unsigned_mult mult0(prod0, sh_cl_dma_pcis_bus.rdata[63:32], sh_cl_dma_pcis_bus.rdata[31:0]);
+cl_unsigned_mult mult1(prod1, sh_cl_dma_pcis_bus.rdata[127:96], sh_cl_dma_pcis_bus.rdata[95:64]);
+cl_unsigned_mult mult2(prod2, sh_cl_dma_pcis_bus.rdata[191:160], sh_cl_dma_pcis_bus.rdata[159:128]);
+cl_unsigned_mult mult3(prod3, sh_cl_dma_pcis_bus.rdata[255:224], sh_cl_dma_pcis_bus.rdata[223:192]);
+cl_unsigned_mult mult4(prod4, sh_cl_dma_pcis_bus.rdata[319:288], sh_cl_dma_pcis_bus.rdata[287:256]);
+cl_unsigned_mult mult5(prod5, sh_cl_dma_pcis_bus.rdata[383:352], sh_cl_dma_pcis_bus.rdata[351:320]);
+cl_unsigned_mult mult6(prod6, sh_cl_dma_pcis_bus.rdata[447:416], sh_cl_dma_pcis_bus.rdata[415:384]);
+cl_unsigned_mult mult7(prod7, sh_cl_dma_pcis_bus.rdata[511:480], sh_cl_dma_pcis_bus.rdata[479:448]);
+
+assign cl_sh_dma_pcis_rdata = {prod0, prod1, prod2, prod3, prod4, prod5, prod6, prod7};
+
+//assign cl_sh_dma_pcis_rdata[63:0] = sh_cl_dma_pcis_bus.rdata[63:32] * sh_cl_dma_pcis_bus.rdata[31:0];
+//assign cl_sh_dma_pcis_rdata[127:64] = sh_cl_dma_pcis_bus.rdata[127:96] * sh_cl_dma_pcis_bus.rdata[95:64];
+//assign cl_sh_dma_pcis_rdata[191:128] = sh_cl_dma_pcis_bus.rdata[191:160] * sh_cl_dma_pcis_bus.rdata[159:128];
+//assign cl_sh_dma_pcis_rdata[255:192] = sh_cl_dma_pcis_bus.rdata[255:224] * sh_cl_dma_pcis_bus.rdata[223:192];
+//assign cl_sh_dma_pcis_rdata[319:256] = sh_cl_dma_pcis_bus.rdata[319:288] * sh_cl_dma_pcis_bus.rdata[287:256];
+//assign cl_sh_dma_pcis_rdata[383:320] = sh_cl_dma_pcis_bus.rdata[383:352] * sh_cl_dma_pcis_bus.rdata[351:320];
+//assign cl_sh_dma_pcis_rdata[447:384] = sh_cl_dma_pcis_bus.rdata[447:416] * sh_cl_dma_pcis_bus.rdata[415:384];
+//assign cl_sh_dma_pcis_rdata[511:448] = sh_cl_dma_pcis_bus.rdata[511:480] * sh_cl_dma_pcis_bus.rdata[479:448];
 
 assign sh_cl_dma_pcis_bus.rready = sh_cl_dma_pcis_rready;
 
