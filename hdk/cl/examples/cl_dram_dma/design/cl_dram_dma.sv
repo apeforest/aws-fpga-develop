@@ -18,6 +18,7 @@ module cl_unsigned_mult (out, a, b);
 	input  [32:0] a;
 	input  [32:0] b;
 
+	assign out = {a, b};
 	assign out = a * b;
 endmodule
 
