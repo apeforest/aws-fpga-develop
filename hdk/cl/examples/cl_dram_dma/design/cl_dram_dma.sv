@@ -252,7 +252,7 @@ assign cl_sh_dma_pcis_rvalid = sh_cl_dma_pcis_bus.rvalid;
 assign cl_sh_dma_pcis_rid = sh_cl_dma_pcis_bus.rid[5:0];
 assign cl_sh_dma_pcis_rlast = sh_cl_dma_pcis_bus.rlast;
 assign cl_sh_dma_pcis_rresp = sh_cl_dma_pcis_bus.rresp;
-assign cl_sh_dma_pcis_rdata = sh_cl_dma_pcis_bus.rdata;
+//assign cl_sh_dma_pcis_rdata = sh_cl_dma_pcis_bus.rdata;
 
 wire [63:0] prod0;
 wire [63:0] prod1;
