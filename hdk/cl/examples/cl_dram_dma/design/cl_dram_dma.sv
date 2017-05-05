@@ -14,9 +14,9 @@
 // limitations under the License.
 
 module cl_unsigned_mult (out, a, b);
-        output [64:0] out;
-	input  [32:0] a;
-	input  [32:0] b;
+        output [63:0] out;
+	input  [31:0] a;
+	input  [31:0] b;
 
 	assign out = {a, b};
 	//assign out = a * b;
