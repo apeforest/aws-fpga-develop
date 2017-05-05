@@ -43,20 +43,35 @@ logic [15:0] vled_value;
       tb.peek(.addr(`MY_EXAMPLE_REG_ADDR), .data(rdata), .id(AXI_ID), .size(DataSize::UINT16), .intf(AxiPort::PORT_OCL));         // start read & write
       $display ("Reading 0x%x from address 0x%x", rdata, `MY_EXAMPLE_REG_ADDR);
 
-      //if (rdata == 32'hBD5B_7DDF) // Check for byte shift in register read
-      if (rdata == 32'h0003_BAAB) // check for 0x0beef * 5
+      if (rdata == 32'hA614_4983) // check for 0x0dead * 0xbeef
         $display ("Test PASSED");
-      else
+      else begin
         $display ("Test FAILED");
+        $display ("%0x", rdata);
+      end
+
+      tb.poke(.addr(`MY_EXAMPLE_REG_ADDR), .data(32'h379A_FE47), .id(AXI_ID), .size(DataSize::UINT16), .intf(AxiPort::PORT_OCL)); // write register
+
+      tb.peek(.addr(`MY_EXAMPLE_REG_ADDR), .data(rdata), .id(AXI_ID), .size(DataSize::UINT16), .intf(AxiPort::PORT_OCL));         // start read & write
+      $display ("Reading 0x%x from address 0x%x", rdata, `MY_EXAMPLE_REG_ADDR);
+
+      if (rdata == 32'h373A_37B6) // check for 0x0379A * 0xFE47
+        $display ("Test PASSED");
+      else begin
+        $display ("Test FAILED");
+        $display ("%0x", rdata);
+      end
+
 
       tb.peek_ocl(.addr(`VLED_REG_ADDR), .data(rdata));         // start read
       $display ("Reading 0x%x from address 0x%x", rdata, `VLED_REG_ADDR);
 
-      if (rdata == 32'h0000_BEEF) // Check for LED register read
+      if (rdata == 32'h0000_FE47) // Check for LED register read
         $display ("Test PASSED");
-      else
+      else begin
         $display ("Test FAILED");
-
+        $display ("%0x", rdata);
+      end
       vled_value = tb.get_virtual_led();
 
       $display ("value of vled:%0x", vled_value);
