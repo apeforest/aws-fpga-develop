@@ -149,8 +149,8 @@ scrb_bus_t ddrd_scrb_bus_q();
        .m_axi_rready  (sh_cl_dma_pcis_q.rready)
    );
 
-   wire [511:0] my_output_ddra;
-   wire [511:0] my_output_ddrb;
+   logic [511:0] my_output_ddra;
+   logic [511:0] my_output_ddrb;
 
    my_mux_module mm_a(.data_in(lcl_cl_sh_ddra_q.rdata), .dready(lcl_cl_sh_ddra_q.rready), .data_out(my_output_ddra));
    my_mux_module mm_b(.data_in(lcl_cl_sh_ddrb_q.rdata), .dready(lcl_cl_sh_ddrb_q.rready), .data_out(my_output_ddrb));
