@@ -13,6 +13,14 @@
 // implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
+module my_mux_module(data_in, dready, data_out);
+	input [511:0] data_in;
+	input dready;
+	output [511:0] data_out;
+	
+	assign data_out = dready ? {data_in[255:0], data_in[511:256]} : data_in; 
+endmodule
+
 module cl_dma_pcis_slv #(parameter SCRB_MAX_ADDR = 64'h3FFFFFFFF, parameter SCRB_BURST_LEN_MINUS1 = 15, parameter NO_SCRB_INST = 1)
 
 (
@@ -140,14 +148,6 @@ scrb_bus_t ddrd_scrb_bus_q();
        .m_axi_rvalid  (sh_cl_dma_pcis_q.rvalid), 
        .m_axi_rready  (sh_cl_dma_pcis_q.rready)
    );
-
-module my_mux_module(data_in, dready, data_out);
-	input [511:0] data_in;
-	input dready;
-	output [511:0] data_out;
-	
-	assign data_out = dready ? {data_in[255:0], data_in[511:256]} : data_in; 
-endmodule
 
 my_mux_module mm_a(.data_in(lcl_cl_sh_ddra_q.rdata), .dready(lcl_cl_sh_ddra_q.rready), .data_out(my_output_ddra));
 my_mux_module mm_b(.data_in(lcl_cl_sh_ddrb_q.rdata), .dready(lcl_cl_sh_ddrb_q.rready), .data_out(my_output_ddrb));
