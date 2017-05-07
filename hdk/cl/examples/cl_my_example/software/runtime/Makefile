@@ -22,9 +22,9 @@ CFLAGS = -DCONFIG_LOGLEVEL=4 -g -Wall $(INCLUDES)
 
 LDLIBS = -lfpga_mgmt -lrt -lpthread
 
-SRC = test_shift.c
+SRC = test_my_example.c
 OBJ = $(SRC:.c=.o)
-BIN = test_shift
+BIN = test_my_example
 
 all: $(BIN) check_env
 
