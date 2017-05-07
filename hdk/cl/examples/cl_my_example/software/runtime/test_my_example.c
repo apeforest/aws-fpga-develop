@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include <fpga_pci.h>
 #include <fpga_mgmt.h>
@@ -116,22 +117,26 @@ int peek_poke_example(int slot_id, int pf_id, int bar_id) {
     rc = fpga_pci_attach(slot_id, pf_id, bar_id, 0, &pci_bar_handle);
     fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
 
-    /* write a value into the mapped address space */
-    uint32_t value = 0xefbeadde;
-    uint32_t expected = 0xdf7d5bbd;
-    rc = fpga_pci_poke(pci_bar_handle, MY_EXAMPLE_REG_ADDR, value);
-    fail_on(rc, out, "Unable to write to the fpga !");
+    for (int i = 0; i < 1000; ++i) {
+    	/* write a value into the mapped address space */
+    	//uint32_t value = 0xefbeadde;
+    	//uint32_t expected = 0xdf7d5bbd;
+	uint32_t value = rand();
+    	rc = fpga_pci_poke(pci_bar_handle, MY_EXAMPLE_REG_ADDR, value);
+    	fail_on(rc, out, "Unable to write to the fpga !");
 
-    /* read it back and print it out; you should expect the byte order to be
-     * reversed (That's what this CL does) */
-    rc = fpga_pci_peek(pci_bar_handle, MY_EXAMPLE_REG_ADDR, &value);
-    fail_on(rc, out, "Unable to read read from the fpga !");
-    printf("register: 0x%x\n", value);
-    if(value == expected) {
-        printf("Resulting value matched expected value 0x%x. It worked!\n", expected);
-    }
-    else{
-        printf("Resulting value did not match expected value 0x%x. Something didn't work.\n", expected);
+    	/* read it back and print it out; you should expect the byte order to be
+     	* reversed (That's what this CL does) */
+    	rc = fpga_pci_peek(pci_bar_handle, MY_EXAMPLE_REG_ADDR, &value);
+    	fail_on(rc, out, "Unable to read read from the fpga !");
+    	printf("register: 0x%x\n", value);
+	uint32_t expected = (value & 0x00ff) * ((value & 0xff00) >> 16);
+    	if(value == expected) {
+        	printf("Resulting value matched expected value 0x%x. It worked!\n", expected);
+    	}
+    	else{
+        	printf("Resulting value did not match expected value 0x%x. Something didn't work.\n", expected);
+    	}
     }
 out:
     /* clean up */

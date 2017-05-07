@@ -1,0 +1,10 @@
+
+test_my_example.c,268
+#define MY_EXAMPLE_REG_ADDR 30,947
+#define VLED_REG_ADDR	31,991
+static uint16_t pci_vendor_id 37,1217
+static uint16_t pci_device_id 38,1284
+const struct logger *logger logger42,1448
+int main(54,1735
+int peek_poke_example(104,3521
+int check_afi_ready(154,5387
