@@ -141,13 +141,13 @@ scrb_bus_t ddrd_scrb_bus_q();
        .m_axi_rready  (sh_cl_dma_pcis_q.rready)
    );
 
-module my_mux_module(
+module my_mux_module(data_in, dready, data_out);
 	input [511:0] data_in;
 	input dready;
 	output [511:0] data_out;
 	
 	assign data_out = dready ? {data_in[255:0], data_in[511:256]} : data_in; 
-);
+endmodule
 
 my_mux_module mm_a(.data_in(lcl_cl_sh_ddra_q.rdata), .dready(lcl_cl_sh_ddra_q.rready), .data_out(my_output_ddra));
 my_mux_module mm_b(.data_in(lcl_cl_sh_ddrb_q.rdata), .dready(lcl_cl_sh_ddrb_q.rready), .data_out(my_output_ddrb));
