@@ -141,6 +141,19 @@ scrb_bus_t ddrd_scrb_bus_q();
        .m_axi_rready  (sh_cl_dma_pcis_q.rready)
    );
 
+module my_mux_module(
+	input [511:0] data_in;
+	input dready;
+	output [511:0] data_out;
+	
+	assign data_out = dready ? {data_in[255:0], data_in[511:256]} : data_in; 
+);
+
+my_mux_module mm_a(.data_in(lcl_cl_sh_ddra_q.rdata), .dready(lcl_cl_sh_ddra_q.rready), .data_out(my_output_ddra));
+my_mux_module mm_b(.data_in(lcl_cl_sh_ddrb_q.rdata), .dready(lcl_cl_sh_ddrb_q.rready), .data_out(my_output_ddrb));
+
+wire [511:0] my_output_ddra;
+wire [511:0] my_output_ddrb;
 
 //---------------------------- 
 // axi interconnect for DDR address decodes 
@@ -644,7 +657,7 @@ scrb_bus_t ddrd_scrb_bus_q();
        .s_axi_arvalid  (lcl_cl_sh_ddra_q.arvalid),
        .s_axi_arready  (lcl_cl_sh_ddra_q.arready),
        .s_axi_rid      (lcl_cl_sh_ddra_q.rid),
-       .s_axi_rdata    (lcl_cl_sh_ddra_q.rdata),
+       .s_axi_rdata    (my_output_ddra),
        .s_axi_rresp    (lcl_cl_sh_ddra_q.rresp),
        .s_axi_rlast    (lcl_cl_sh_ddra_q.rlast),
        .s_axi_rvalid   (lcl_cl_sh_ddra_q.rvalid),
@@ -937,7 +950,7 @@ scrb_bus_t ddrd_scrb_bus_q();
        .s_axi_arvalid  (lcl_cl_sh_ddrb_q.arvalid),
        .s_axi_arready  (lcl_cl_sh_ddrb_q.arready),
        .s_axi_rid      (lcl_cl_sh_ddrb_q.rid),
-       .s_axi_rdata    (lcl_cl_sh_ddrb_q.rdata),
+       .s_axi_rdata    (my_output_ddrb),
        .s_axi_rresp    (lcl_cl_sh_ddrb_q.rresp),
        .s_axi_rlast    (lcl_cl_sh_ddrb_q.rlast),
        .s_axi_rvalid   (lcl_cl_sh_ddrb_q.rvalid),
