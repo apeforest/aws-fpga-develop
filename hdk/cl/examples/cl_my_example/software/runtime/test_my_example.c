@@ -44,8 +44,7 @@ const struct logger *logger = &logger_stdout;
 
 /* Declaring the local functions */
 
-int peek_poke_example(int slot, int pf_id, int bar_id);
-int vled_example(int slot);
+int get_dot_product_fpga(int slot, int pf_id, int bar_id, uint16_t *vec1, uint16_t *vec2, ulong vec_size);
 
 /* Declating auxilary house keeping functions */
 int initialize_log(char* log_name);
@@ -69,27 +68,33 @@ int main(int argc, char **argv) {
     
     /* Accessing the CL registers via AppPF BAR0, which maps to sh_cl_ocl_ AXI-Lite bus between AWS FPGA Shell and the CL*/
 
-    printf("===== Starting with peek_poke_example =====\n");	
-    rc = peek_poke_example(slot_id, FPGA_APP_PF, APP_PF_BAR0);
-    fail_on(rc, out, "peek-poke example failed");
+    ulong vec_size = 1e6;
+    uint16_t *vec1 = (uint16_t) malloc(vec_size * uint16_t);
+    uint16_t *vec2 = (uint16_t) malloc(vec_size * uint16_t);
 
+    ulong i = 0;
 
-    printf("Developers are encourged to modify the Virtual DIP Switch by calling the linux shell command to demonstrate how AWS FPGA Virtual DIP switches can be used to change a CustomLogic functionality:\n");
-    printf("$ fpga-set-virtual-dip-switch -S (slot-id) -D (16 digit setting)\n\n");
-    printf("In this example, setting a virtual DIP switch to zero clears the corresponding LED, even if the peek-poke example would set it to 1.\nFor instance:\n");
-     
-    printf(
-        "# fpga-set-virtual-dip-switch -S 0 -D 1111111111111111\n"
-        "# fpga-get-virtual-led  -S 0\n"
-        "FPGA slot id 0 have the following Virtual LED:\n"
-        "1010-1101-1101-1110\n"
-        "# fpga-set-virtual-dip-switch -S 0 -D 0000000000000000\n"
-        "# fpga-get-virtual-led  -S 0\n"
-        "FPGA slot id 0 have the following Virtual LED:\n"
-        "0000-0000-0000-0000\n"
-    );
+    for (i = 0; i < vec_size; ++i) {
+    	vec1[i] = rand();
+	vec2[i] = rand();
+    }	
 
-  
+    ulong cpu_result = 0;
+    for (i = 0; i < vec_size; ++i) {
+	cpu_result += vec1[i] * vec2[i];
+    }
+    
+    printf("===== Starting with peek_poke_example =====\n");
+    ulong fpga_result = 0;
+    rc = get_dot_product_fpga(slot_id, FPGA_APP_PF, APP_PF_BAR0, vec1, vec2, vec_size, &fpga_result);
+    fail_on(rc, out, "fpga dot product failed");
+
+    if (cpu_result == fpga_result) {
+	printf("result between FPGA and CPU match!\n");
+    }
+    else {
+	printf("FPGA result %d does not match CPU result %d\n", fpga_result, cpu_result);    
+    }
     return rc;
     
    
@@ -99,10 +104,9 @@ out:
 
 
 
-/*
- * An example to attach to an arbitrary slot, pf, and bar with register access.
+/* use FPGA to calculate dot product
  */
-int peek_poke_example(int slot_id, int pf_id, int bar_id) {
+int get_dot_product_fpga(int slot_id, int pf_id, int bar_id, uint16_t *vec1, uint16_t *vec2, ulong vec_size, ulong *result) {
     int rc;
     /* pci_bar_handle_t is a handler for an address space exposed by one PCI BAR on one of the PCI PFs of the FPGA */
 
@@ -117,28 +121,19 @@ int peek_poke_example(int slot_id, int pf_id, int bar_id) {
     rc = fpga_pci_attach(slot_id, pf_id, bar_id, 0, &pci_bar_handle);
     fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
 
-    int i = 0;
-    for (i = 0; i < 1000; ++i) {
+    ulong i = 0;
+    *result = 0;
+    for (i = 0; i < vec_size; ++i) {
     	/* write a value into the mapped address space */
-    	//uint32_t value = 0xefbeadde;
-    	//uint32_t expected = 0xdf7d5bbd;
-	uint32_t value = rand();
- 	uint32_t expected = (value & 0x0000ffff) * ((value & 0xffff0000) >> 16);   
+	uint32_t value = vec1[i] << 16 + vec2[i]; 
 	rc = fpga_pci_poke(pci_bar_handle, MY_EXAMPLE_REG_ADDR, value);
     	fail_on(rc, out, "Unable to write to the fpga !");
 
-    	/* read it back and print it out; you should expect the byte order to be
-     	* reversed (That's what this CL does) */
+    	/* read it back as a product of the lower and upper 16 bit unsigned */ 
     	rc = fpga_pci_peek(pci_bar_handle, MY_EXAMPLE_REG_ADDR, &value);
     	fail_on(rc, out, "Unable to read read from the fpga !");
     	printf("register: 0x%x\n", value);
-	
-    	if(value == expected) {
-        	printf("Resulting value matched expected value 0x%x. It worked!\n", expected);
-    	}
-    	else{
-        	printf("Resulting value did not match expected value 0x%x. Something didn't work.\n", expected);
-    	}
+	*result += value;
     }
 out:
     /* clean up */
