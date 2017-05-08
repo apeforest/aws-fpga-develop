@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
     
     /* Accessing the CL registers via AppPF BAR0, which maps to sh_cl_ocl_ AXI-Lite bus between AWS FPGA Shell and the CL*/
 
-    uint32_t num_iters = 1000;
+    uint32_t num_iters = 5000;
     uint32_t vec_size = 1000;
     printf("===== Starting computation of %d dimension vector inner product %d times=====\n", vec_size, num_iters);   
     uint32_t k;
@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
     	free(vec2);
     }
     gettimeofday(&stop, NULL);
-    printf("Runtime of CPU is %lu milliseconds\n", stop.tv_usec - start.tv_usec);
+    printf("Runtime of CPU is %lu microseconds\n", stop.tv_usec - start.tv_usec);
     
     return rc;
 out:
@@ -161,7 +161,7 @@ int get_dot_product_fpga(int slot_id, int pf_id, int bar_id, uint16_t *vec1, uin
     }
 
     gettimeofday(&stop, NULL);
-    printf("Runtime of FPGA is %lu milliseconds\n", stop.tv_usec - start.tv_usec);
+    printf("Runtime of FPGA is %lu microseconds\n", (stop.tv_usec - start.tv_usec)*10);
 out:
     /* clean up */
     if (pci_bar_handle >= 0) {
