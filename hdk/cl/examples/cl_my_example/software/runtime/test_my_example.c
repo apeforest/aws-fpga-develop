@@ -18,7 +18,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
-
+#include <sys/time.h>
 #include <fpga_pci.h>
 #include <fpga_mgmt.h>
 #include <utils/lcd.h>
@@ -44,8 +44,8 @@ const struct logger *logger = &logger_stdout;
 
 /* Declaring the local functions */
 
-int get_dot_product_fpga(int slot, int pf_id, int bar_id, uint16_t *vec1, uint16_t *vec2, ulong vec_size);
-
+int get_dot_product_fpga(int slot, int pf_id, int bar_id, uint16_t *vec1, uint16_t *vec2, uint32_t vec_size, double expect);
+double get_elapsed_time(time_t end, time_t start);
 /* Declating auxilary house keeping functions */
 int initialize_log(char* log_name);
 int check_afi_ready(int slot);
@@ -68,45 +68,56 @@ int main(int argc, char **argv) {
     
     /* Accessing the CL registers via AppPF BAR0, which maps to sh_cl_ocl_ AXI-Lite bus between AWS FPGA Shell and the CL*/
 
-    ulong vec_size = 1e6;
-    uint16_t *vec1 = (uint16_t) malloc(vec_size * uint16_t);
-    uint16_t *vec2 = (uint16_t) malloc(vec_size * uint16_t);
+    uint32_t num_iters = 5000;
+    uint32_t vec_size = 1000;
+    printf("===== Starting computation of %d vector dot product %d times=====\n", vec_size, num_iters);   
+    uint32_t k;
+    struct timeval stop, start;
+    gettimeofday(&start, NULL);
+    for (k = 0; k < num_iters; ++k) {
+    	uint16_t *vec1 = (uint16_t *) malloc(vec_size * sizeof(uint16_t));
+    	uint16_t *vec2 = (uint16_t *) malloc(vec_size * sizeof(uint16_t));
 
-    ulong i = 0;
+    	uint32_t i = 0;
+    	
+        double result = 0;
+    	for (i = 0; i < vec_size; ++i) {
+    	    vec1[i] = rand();
+	    vec2[i] = rand();
+    	}	
+    	
+    	
+	for (i = 0; i < vec_size; ++i) {
+	    result += ((uint32_t)vec1[i]) * ((uint32_t)vec2[i]);
+    	}
+   	
+	if (k == 0) { 
+    	    rc = get_dot_product_fpga(slot_id, FPGA_APP_PF, APP_PF_BAR0, vec1, vec2, vec_size, result);
+	    fail_on(rc, out, "fpga dot product failed");    
 
-    for (i = 0; i < vec_size; ++i) {
-    	vec1[i] = rand();
-	vec2[i] = rand();
-    }	
-
-    ulong cpu_result = 0;
-    for (i = 0; i < vec_size; ++i) {
-	cpu_result += vec1[i] * vec2[i];
+	}
+	
+	free(vec1);
+    	free(vec2);
     }
+    gettimeofday(&stop, NULL);
+    printf("Runtime of CPI is %lu milliseconds\n", stop.tv_usec - start.tv_usec);
     
-    printf("===== Starting with peek_poke_example =====\n");
-    ulong fpga_result = 0;
-    rc = get_dot_product_fpga(slot_id, FPGA_APP_PF, APP_PF_BAR0, vec1, vec2, vec_size, &fpga_result);
-    fail_on(rc, out, "fpga dot product failed");
-
-    if (cpu_result == fpga_result) {
-	printf("result between FPGA and CPU match!\n");
-    }
-    else {
-	printf("FPGA result %d does not match CPU result %d\n", fpga_result, cpu_result);    
-    }
     return rc;
-    
-   
 out:
     return 1;
 }
 
+double get_cpu_time(clock_t end, clock_t start) {
+    return ((double) (end-start) * 1000)/CLOCKS_PER_SEC;
+}
 
-
+double get_elapsed_time(time_t end, time_t start) {
+    return difftime(end, start) * 1000;
+}
 /* use FPGA to calculate dot product
  */
-int get_dot_product_fpga(int slot_id, int pf_id, int bar_id, uint16_t *vec1, uint16_t *vec2, ulong vec_size, ulong *result) {
+int get_dot_product_fpga(int slot_id, int pf_id, int bar_id, uint16_t *vec1, uint16_t *vec2, uint32_t vec_size, double expect) {
     int rc;
     /* pci_bar_handle_t is a handler for an address space exposed by one PCI BAR on one of the PCI PFs of the FPGA */
 
@@ -121,20 +132,36 @@ int get_dot_product_fpga(int slot_id, int pf_id, int bar_id, uint16_t *vec1, uin
     rc = fpga_pci_attach(slot_id, pf_id, bar_id, 0, &pci_bar_handle);
     fail_on(rc, out, "Unable to attach to the AFI on slot id %d", slot_id);
 
-    ulong i = 0;
-    *result = 0;
+    double result = 0;
+    uint32_t i = 0;
+
+    struct timeval stop, start;
+    gettimeofday(&start, NULL);
+
     for (i = 0; i < vec_size; ++i) {
     	/* write a value into the mapped address space */
-	uint32_t value = vec1[i] << 16 + vec2[i]; 
+	uint32_t value = (vec1[i] << 16) + vec2[i]; 
 	rc = fpga_pci_poke(pci_bar_handle, MY_EXAMPLE_REG_ADDR, value);
     	fail_on(rc, out, "Unable to write to the fpga !");
 
-    	/* read it back as a product of the lower and upper 16 bit unsigned */ 
+    	/* read it back as a product of the lower and upper 16 bit unsigned */
+        
     	rc = fpga_pci_peek(pci_bar_handle, MY_EXAMPLE_REG_ADDR, &value);
+
     	fail_on(rc, out, "Unable to read read from the fpga !");
-    	printf("register: 0x%x\n", value);
-	*result += value;
+        result += value;
     }
+
+
+    if (result != expect) {
+	printf("result of FPGA %.2f does not match expected %.2f\n", result, expect);
+    }
+    else {
+	printf("result of FPGA and CPU match!\n");
+    }
+
+    gettimeofday(&stop, NULL);
+    printf("Runtime of FPGA is %lu milliseconds\n", stop.tv_usec - start.tv_usec);
 out:
     /* clean up */
     if (pci_bar_handle >= 0) {
