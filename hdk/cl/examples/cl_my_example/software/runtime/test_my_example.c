@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
 
     uint32_t num_iters = 5000;
     uint32_t vec_size = 1000;
-    printf("===== Starting computation of %d vector dot product %d times=====\n", vec_size, num_iters);   
+    printf("===== Starting computation of %d dimension vector inner product %d times=====\n", vec_size, num_iters);   
     uint32_t k;
     struct timeval stop, start;
     gettimeofday(&start, NULL);
