@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
     
     /* Accessing the CL registers via AppPF BAR0, which maps to sh_cl_ocl_ AXI-Lite bus between AWS FPGA Shell and the CL*/
 
-    uint32_t num_iters = 5000;
+    uint32_t num_iters = 500000;
     uint32_t vec_size = 1000;
     printf("===== Starting computation of %d dimension vector inner product %d times=====\n", vec_size, num_iters);   
     uint32_t k;
