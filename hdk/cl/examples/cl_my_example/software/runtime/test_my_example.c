@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
     	free(vec2);
     }
     gettimeofday(&stop, NULL);
-    printf("Runtime of CPI is %lu milliseconds\n", stop.tv_usec - start.tv_usec);
+    printf("Runtime of CPU is %lu milliseconds\n", stop.tv_usec - start.tv_usec);
     
     return rc;
 out:
